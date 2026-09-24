@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="preload" href="/inter.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Federal Sales Pipeline Review Tool | Deal Check</title>
-<meta name="description" content="Free pipeline-review tool for federal sellers and sales managers. Five questions (customer, money, power, path, now) scored in your browser. No login, no CRM, no customer data.">
+<meta name="description" content="Five questions (customer, money, power, path, now) that separate proof from hopium in a federal deal. Scored in your browser. No login, no CRM.">
 <link rel="canonical" href="https://sellclouds.com/deal/">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
@@ -140,7 +141,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="../kmd.css">
+<link rel="stylesheet" href="../site.css">
 <script src="../analytics.js" defer></script>
 </head>
 <body>
@@ -344,7 +345,7 @@
 'use strict';
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const kmd = (n) => { if (typeof window.kmd === 'function') window.kmd(n); else (window.kmdQ = window.kmdQ || []).push(n); };
+const track = (n) => { if (typeof window.scTrack === 'function') window.scTrack(n); else (window.scTrackQ = window.scTrackQ || []).push(n); };
 const el = () => document.getElementById('screen');
 // Every screen change fades up. Re-trigger the animation by toggling the class.
 const show = (html) => { const e = el(); e.classList.remove('enter'); e.innerHTML = html; void e.offsetWidth; e.classList.add('enter'); focusScreen(e); };
@@ -453,7 +454,7 @@ function copyText(text) {
 }
 // Button feedback is always short enough to fit the pill.
 function copyDM(btn, text) {
-  kmd('dm_copy');
+  track('dm_copy');
   copyText(text)
     .then(() => {
       btn.textContent = 'Copied ✓';
@@ -544,9 +545,9 @@ let restoring = false;
 // Each screen is a history entry, so the phone's back gesture steps back a screen instead of leaving.
 function nav(st) {
   if (restoring) return;
-  const cur = history.state && history.state.kmd;
+  const cur = history.state && history.state.sc;
   const same = cur && JSON.stringify(cur) === JSON.stringify(st);
-  try { (same ? history.replaceState : history.pushState).call(history, { kmd: st }, '', location.href); } catch {}
+  try { (same ? history.replaceState : history.pushState).call(history, { sc: st }, '', location.href); } catch {}
 }
 // Focus the new screen's heading so keyboard and screen-reader users land where the content is.
 function focusScreen(e) {
@@ -577,7 +578,7 @@ function home() {
 }
 
 function ask(i) {
-  if (i === 0 && !answers.customer) kmd('start');
+  if (i === 0 && !answers.customer) track('start');
   nav(['q', i]);
   const p = P[i];
   show(`
@@ -616,7 +617,7 @@ function result(shared) {
   const s = score(answers);
   lastScore = s;
   nav(['r']);
-  kmd(shared ? 'verdict_shared' : 'verdict');
+  if (!restoring) track(shared ? 'verdict_shared' : 'verdict');   // a back/forward restore is not a new verdict
 
   try { 
     if (s.total >= 75) navigator.vibrate(50);
@@ -654,7 +655,7 @@ function result(shared) {
       <button class="btn btn-text" id="again" type="button">Start over</button>
     </div>`);
 
-  document.getElementById('grill').onclick = () => { kmd('grill'); grillStep = 0; grillOuch = 0; grill(); };
+  document.getElementById('grill').onclick = () => { track('grill'); grillStep = 0; grillOuch = 0; grill(); };
   document.getElementById('again').onclick = () => { answers = {}; clearHash(); ask(0); };
   const rm = document.getElementById('runMine');
   if (rm) rm.onclick = () => { answers = {}; clearHash(); ask(0); };
@@ -663,7 +664,7 @@ function result(shared) {
     const btn = e.currentTarget;
     // Sharing is the one moment the verdict is allowed into the address bar.
     try { history.replaceState(null, '', '#' + encodeAnswers()); } catch {}
-    kmd('share');
+    track('share');
     shareOut(btn, shareBlock(s), 'Deal Check');
   };
   
@@ -743,15 +744,15 @@ function mountMark(text) {
 }
 
 /* Boot */
-window.KMD_BUILD = '2026-09-29.0900'; // console check for what's deployed
+window.SC_BUILD = '2026-09-29.0900'; // console check for what's deployed
 const INTRO_HTML = el().innerHTML;
-try { history.replaceState({ kmd: ['h'] }, '', location.href); } catch {}
+try { history.replaceState({ sc: ['h'] }, '', location.href); } catch {}
 const fromHash = readHash();
 if (fromHash) { Object.assign(answers, fromHash); result(true); }
 // A shared link opened in a tab that already has the site.
 window.addEventListener('hashchange', () => { const h = readHash(); if (h) { answers = {}; Object.assign(answers, h); result(true); } });
 window.addEventListener('popstate', (e) => {
-  const st = e.state && e.state.kmd; restoring = true;
+  const st = e.state && e.state.sc; restoring = true;
   const complete = P.every(p => answers[p.k]);
   try {
     if (!st || st[0] === 'h') intro();

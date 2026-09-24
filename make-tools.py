@@ -92,7 +92,7 @@ def page(t):
   ]
 }}
 </script>
-<link rel="stylesheet" href="../kmd.css">
+<link rel="stylesheet" href="../site.css">
 <script src="../analytics.js" defer></script>
 </head>
 <body>
@@ -121,7 +121,7 @@ def page(t):
 <script src="../check.js"></script>
 <script>
 'use strict';
-window.KMD_BUILD = '{BUILD}';
+window.SC_BUILD = '{BUILD}';
 {t['config']}
 </script>
 </body>
@@ -131,8 +131,8 @@ window.KMD_BUILD = '{BUILD}';
 # ────────────────────────────── REP CHECK ──────────────────────────────
 REP = dict(
     slug='rep', name='Rep Check',
-    title='Is It the Rep or the Territory? Five Questions for Sales Managers | Rep Check',
-    desc='Five questions that separate a rep problem from a territory, skill or effort problem wearing a performance costume. For sales managers. One minute, no names, nothing stored.',
+    title='Rep Check: Is It the Rep or the Territory?',
+    desc='Is it the rep, the patch, a skill gap or an effort gap? Five questions for sales managers. No names, nothing stored.',
     ogdesc='Before you write them up, figure out what you inherited. Five questions, one minute, no names.',
     h1='Before you write them up, figure out what you inherited.',
     dek='Five questions that separate a rep problem from a territory, skill or effort problem wearing a performance costume. For managers. One minute. No names.',
@@ -240,8 +240,8 @@ REP = dict(
 # ────────────────────────────── PARTNER CHECK ──────────────────────────────
 PARTNER = dict(
     slug='partner', name='Partner Check',
-    title='Is This Partnership Real? Five Questions for Partner Managers | Partner Check',
-    desc='Five questions that separate a partner who sells with you from a logo on a slide. For partner managers, alliance leads and anyone who owns a co-sell number. One minute, no names, nothing stored.',
+    title='Partner Check: Is This Partnership Real?',
+    desc='Five questions that separate a partner who sells with you from a logo on a slide. For partner managers. One minute, nothing stored.',
     ogdesc='Before you renew the partnership, test it. Five questions, one minute, no names.',
     h1='Before you renew the partnership, test it.',
     dek='Five questions that separate a partner who sells with you from a logo on a slide. For partner managers and anyone who owns a co-sell number. One minute. No names.',
@@ -323,8 +323,8 @@ PARTNER = dict(
 # ────────────────────────────── TERRITORY CHECK ──────────────────────────────
 TERRITORY = dict(
     slug='territory', name='Territory Check',
-    title='Can This Territory Make the Number? Five Questions for Sellers | Territory Check',
-    desc='Five questions that tell you whether the patch can make the number, or whether you are being asked to grow where nobody could. For sellers. One minute, no account names, nothing stored.',
+    title='Territory Check: Can This Patch Make the Number?',
+    desc='Can the patch make the number, or are you being asked to grow where nobody could? Five questions for sellers. Nothing stored.',
     ogdesc='Before you sign up for the number, test the territory. Five questions, one minute, no account names.',
     h1='Before you sign up for the number, test the territory.',
     dek='Five questions that tell you whether the patch can make the number, or whether you are being asked to grow where nobody could. For sellers. One minute. No account names.',
@@ -405,8 +405,8 @@ TERRITORY = dict(
 
 OLR = dict(
     slug='olr', name='OLR Check',
-    title='OLR Prep for Amazon Managers: Will Your Case Survive Calibration? | OLR Check',
-    desc='Five questions that test the case you are about to make for a rep in OLR, before a room full of managers who do not know them tests it for you. No names, no ratings, nothing stored.',
+    title='OLR Prep: Will Your Case Survive Calibration? | OLR Check',
+    desc="Five questions that test the case you're making for a rep in OLR, then the room grills you. No names, no ratings, nothing stored.",
     ogdesc='Before you walk into OLR, test your case. Five questions, then the room grills you. No names, no ratings.',
     h1='Before you walk into OLR, test your case.',
     dek='Five questions that separate a case the room will accept from a story it will take apart. For managers with a rep to defend in calibration. One minute. No names, no ratings.',
@@ -517,8 +517,8 @@ OLR = dict(
 
 BRIEF = dict(
     slug='brief', name='Brief Check',
-    title='Will Your Brief Survive the Room? Five Questions Before the Meeting | Brief Check',
-    desc='Five questions about the doc, the deck or the QBR you are about to present, then the room grills you. Finds the question you are hoping nobody asks, before the meeting does. Nothing uploaded, nothing stored.',
+    title='Brief Check: Will Your Brief Survive the Room?',
+    desc="Five questions about the doc, deck or QBR you're about to present, then the room grills you. Nothing uploaded, nothing stored.",
     ogdesc="What's the question you're hoping nobody asks? Brief Check finds it before the meeting does.",
     h1="What's the question you're hoping nobody asks?",
     dek='Brief Check finds it before the meeting does. Five questions about the doc, the deck or the QBR you are about to present. One minute. Nothing uploaded.',
@@ -707,7 +707,7 @@ def note_head(title, desc, url):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{title} | SellClouds Field Notes</title>
+<title>{title} | SellClouds</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{url}">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
@@ -727,7 +727,7 @@ def note_head(title, desc, url):
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F9FCFF">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101418">
-<link rel="stylesheet" href="/kmd.css">
+<link rel="stylesheet" href="/site.css">
 <script src="/analytics.js" defer></script>
 '''
 NOTE_TAIL = '''<footer class="sitefoot">
@@ -831,6 +831,9 @@ def header(path):
   </header>'''
 def chrome(path):
     s = open(path).read()
+    # preload the one font every page uses, so headlines don't flash in a fallback face
+    if 'rel="preload" href="/inter.woff2"' not in s:
+        s = s.replace('<meta name="viewport"', '<link rel="preload" href="/inter.woff2" as="font" type="font/woff2" crossorigin>\n<meta name="viewport"', 1)
     s = re.sub(r'<header class="appbar">.*?</header>', lambda m: header(path), s, count=1, flags=re.S)
     if path != '404.html':
         mark = MARK_SRC.replace('{ROOT}', root_of(path)).replace('{UTM}', utm_of(path))

@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="preload" href="/inter.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pipeline Coverage Calculator for Sales Managers | Pipeline Check</title>
-<meta name="description" content="Free pipeline coverage calculator. 3X is a rule of thumb; your win rate says what you actually need. Target, pipeline, win rate, scored in your browser. No login, nothing stored.">
+<title>Pipeline Coverage Calculator | Pipeline Check</title>
+<meta name="description" content="Free pipeline coverage calculator. 3X is a rule of thumb; your win rate says what you actually need. No login, nothing stored.">
 <link rel="canonical" href="https://sellclouds.com/pipeline/">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
 <link rel="icon" type="image/svg+xml" href="../favicon.svg">
@@ -93,7 +94,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="../kmd.css">
+<link rel="stylesheet" href="../site.css">
 <script src="../analytics.js" defer></script>
 </head>
 <body>
@@ -247,8 +248,8 @@
 </footer>
 <script>
 'use strict';
-window.KMD_BUILD = '2026-10-02.0900';
-const kmd = (n) => { if (typeof window.kmd === 'function') window.kmd(n); else (window.kmdQ = window.kmdQ || []).push(n); };
+window.SC_BUILD = '2026-10-02.1100';
+const track = (n) => { if (typeof window.scTrack === 'function') window.scTrack(n); else (window.scTrackQ = window.scTrackQ || []).push(n); };
 const esc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const $ = (id) => document.getElementById(id);
 const TARGET = 3;
@@ -460,8 +461,8 @@ function render() {
       </div>
       <p class="fine" style="text-align:center;margin:4px 0 0;">Free either way. I answer LinkedIn faster than email.</p>
     </div>`;
-  $('copy').onclick = (e) => { kmd('pipeline_share'); try { history.replaceState(null, '', '#' + encodeInputs()); } catch {} shareOut(e.currentTarget, shareBlock(s), 'Pipeline Check'); };
-  $('dmBtn').onclick = (e) => { const btn = e.currentTarget; kmd('pipeline_dm_copy');
+  $('copy').onclick = (e) => { track('pipeline_share'); try { history.replaceState(null, '', '#' + encodeInputs()); } catch {} shareOut(e.currentTarget, shareBlock(s), 'Pipeline Check'); };
+  $('dmBtn').onclick = (e) => { const btn = e.currentTarget; track('pipeline_dm_copy');
     copyText(dmText(s)).then(() => { btn.textContent = 'Copied ✓'; window.open('https://www.linkedin.com/in/markflournoy/', '_blank', 'noopener'); }).catch(() => { btn.textContent = "Couldn't copy"; }); };
   out.querySelector('.preview').onclick = (e) => { const r = document.createRange(); r.selectNodeContents(e.currentTarget); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); };
   sumbar(s);
@@ -490,7 +491,7 @@ if ('IntersectionObserver' in window) {
 
 /* ── wiring ── */
 const onEdit = () => {
-  if (!touched) { touched = true; kmd('pipeline_edit'); $('exnote').textContent = ''; }
+  if (!touched) { touched = true; track('pipeline_edit'); $('exnote').textContent = ''; }
   if (shared) { shared = false; try { history.replaceState(null, '', location.pathname); } catch {} }
   render();
 };
@@ -500,14 +501,14 @@ const onEdit = () => {
 $('win').addEventListener('blur', () => { const v = parseRate($('win').value); if (v) $('win').value = pct(v); });
 // Selecting the whole field on focus makes typing over an example one step.
 document.querySelectorAll('.calc-in input').forEach(inp => inp.addEventListener('focus', () => { setTimeout(() => { try { inp.select(); } catch {} }, 0); }));
-document.querySelectorAll('[data-win]').forEach(b => b.onclick = () => { $('win').value = b.dataset.win + '%'; kmd('pipeline_winrate'); onEdit(); });
+document.querySelectorAll('[data-win]').forEach(b => b.onclick = () => { $('win').value = b.dataset.win + '%'; track('pipeline_winrate'); onEdit(); });
 document.querySelectorAll('[data-ye]').forEach(b => b.onclick = () => { yearEnd = b.dataset.ye; onEdit(); });
 $('justMe').onclick = () => { $('reps').value = '1'; onEdit(); };
 $('f').addEventListener('submit', (e) => e.preventDefault());
-if (readHash()) { shared = true; touched = true; $('exnote').textContent = ''; kmd('pipeline_verdict_shared'); }
+if (readHash()) { shared = true; touched = true; $('exnote').textContent = ''; track('pipeline_verdict_shared'); }
 window.addEventListener('hashchange', () => { if (readHash()) { shared = true; render(); } });
 render();
-window.KMD_TEST = { compute, read, calendar };
+window.SC_TEST = { compute, read, calendar };
 </script>
 </body>
 </html>

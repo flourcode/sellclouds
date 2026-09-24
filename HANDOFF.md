@@ -3,7 +3,7 @@
 Everything needed to maintain, extend or rebuild this. One directory, two
 pages, one shared stylesheet and font, no build step, no server, no dependencies.
 
-**Current build: 2026-10-02.0900**
+**Current build: 2026-10-02.1100**
 
 ## Naming: checks, not kills
 
@@ -22,8 +22,7 @@ most-quoted word on the site and funny without being dark. Do not bring
 "kill", "dead" or weapons language back into names, headlines, verdicts or
 buttons. The dead bluebird mascot is retired; the only mark is Mark's
 S-cloud. The engine is `check.js` (`CheckTool({...})`); URLs and analytics
-event names were already neutral and did not change. killmydeal.com still
-redirects path by path, and the home FAQ explains the rename.
+event names were already neutral and did not change.
 
 ## SellClouds
 
@@ -45,7 +44,7 @@ acceleration, framework, thought leadership, masterclass.
 | `/notes/` | **Field Notes**: short reads, each ending with the tool that does the math |
 | `partials/mark.html` | the About section every page carries (bio, situations, *Need another set of eyes?*) |
 | `home.src.html` | source for the home page; the script fills in the notes list |
-| `kmd.css`, `inter.woff2` | shared design system and typeface |
+| `site.css`, `inter.woff2` | shared design system and typeface |
 | `check.js`, `make-tools.py` | the shared engine; the generator for tools, notes, home, header and About |
 
 **One command builds everything.** `python3 make-tools.py` regenerates the five
@@ -481,7 +480,7 @@ machine tells. Use a colon, a comma, parentheses, or a new sentence.
 | SEO copy, FAQ, bio, offer | the `<section class="band">` blocks |
 | Structured data | the `application/ld+json` block in `<head>` |
 | Google Analytics ID, events | `analytics.js` |
-| Colour, type, shape, motion | `:root` tokens at the top of `kmd.css` |
+| Colour, type, shape, motion | `:root` tokens at the top of `site.css` |
 | Pipeline Check model, tiers, copy | `compute()` in `pipeline/index.html` |
 | Pipeline Check share / DM | `shareBlock()`, `dmText()` there — the DM carries multiples, never dollars |
 
@@ -566,42 +565,33 @@ week. There is no asset versioning, so a CSS change is live within an hour.
 
 Set these in the Amplify console; they cannot live in the repo.
 
-1. **Domains.** Attach **sellclouds.com** (primary, with www redirecting to
-   the apex) *and* **killmydeal.com** to the same Amplify app. killmydeal.com
-   must stay attached, or the redirects below never fire.
-2. **Rewrites and redirects**, in this order (specific before general, the
-   404 catch-all last):
+1. **Domain.** Attach **sellclouds.com** under *Hosting → Custom domains*,
+   with www redirecting to the apex. killmydeal.com was retired at launch
+   and is not used anywhere.
+2. **Rewrites and redirects** (*Hosting → Rewrites and redirects → Manage
+   redirects → text editor*), in this order; the 404 catch-all must be last:
 
 ```json
 [
   { "source": "https://www.sellclouds.com/<*>", "status": "301", "target": "https://sellclouds.com/<*>" },
-  { "source": "https://killmydeal.com", "status": "301", "target": "https://sellclouds.com/deal/" },
-  { "source": "https://killmydeal.com/", "status": "301", "target": "https://sellclouds.com/deal/" },
-  { "source": "https://www.killmydeal.com", "status": "301", "target": "https://sellclouds.com/deal/" },
-  { "source": "https://www.killmydeal.com/", "status": "301", "target": "https://sellclouds.com/deal/" },
-  { "source": "https://killmydeal.com/case/<*>", "status": "301", "target": "https://sellclouds.com/olr/" },
-  { "source": "https://killmydeal.com/<*>", "status": "301", "target": "https://sellclouds.com/<*>" },
-  { "source": "https://www.killmydeal.com/<*>", "status": "301", "target": "https://sellclouds.com/<*>" },
-  { "source": "/pipeline", "status": "301", "target": "/pipeline/" },
   { "source": "/deal", "status": "301", "target": "/deal/" },
-  { "source": "/case/<*>", "status": "301", "target": "/olr/" },
+  { "source": "/pipeline", "status": "301", "target": "/pipeline/" },
+  { "source": "/brief", "status": "301", "target": "/brief/" },
+  { "source": "/territory", "status": "301", "target": "/territory/" },
+  { "source": "/partner", "status": "301", "target": "/partner/" },
+  { "source": "/rep", "status": "301", "target": "/rep/" },
+  { "source": "/olr", "status": "301", "target": "/olr/" },
+  { "source": "/notes", "status": "301", "target": "/notes/" },
   { "source": "/<*>", "status": "404", "target": "/404.html" }
 ]
 ```
 
-   Every tool kept its slug, so killmydeal.com/pipeline/ lands on
-   sellclouds.com/pipeline/, and the old home page lands on /deal/. Browsers
-   keep the `#` fragment across a 301, so a shared verdict link like
-   killmydeal.com/#ysnys arrives at sellclouds.com/deal/#ysnys with the
-   verdict intact.
-3. **Search Console.** Verify sellclouds.com, submit its sitemap, and use
-   *Change of address* on the killmydeal.com property so the ranking moves
-   with the pages.
+3. **Search Console.** Verify sellclouds.com and submit its sitemap.
 4. **Analytics**: paste the GA4 measurement ID into `GA_ID` in `analytics.js`.
 5. **Calendly**: the free call is described as 20 minutes everywhere; make
    sure the `chat-with-mark` event is 20 minutes, or change the copy.
 
-After deploy: open the site, type `KMD_BUILD` in the console and check it
+After deploy: open the site, type `SC_BUILD` in the console and check it
 matches this file; share a link in Slack or LinkedIn and confirm `card.jpg`
 renders; submit `sitemap.xml` in Google Search Console.
 
@@ -906,7 +896,7 @@ tools share a verdict word (OLR's middle tier is *Not yet*, Territory keeps
 - `/pipeline/` added: coverage against target and win rate, same ladder, same
   share/DM pattern, cross-linked both ways. `card-pipeline.jpg` and a
   `pipeline` mode in `make-card.py`.
-- Shared `kmd.css` and `inter.woff2` extracted; `index.html` 118 KB → 37 KB.
+- Shared `site.css` and `inter.woff2` extracted; `index.html` 118 KB → 37 KB.
 - Homepage: doorway block in the review section, footer link, `knowsAbout`
   on the Person schema (the one useful thing in the old site's structured data).
 - `sitemap.xml` lists both pages.
@@ -920,10 +910,10 @@ tools share a verdict word (OLR's middle tier is *Not yet*, Territory keeps
 - Bio text wraps the photo instead of a second column.
 - `bluebird-dark.png`: light outline for dark mode, via `<picture>`.
 - Privacy copy cut to dek + FAQ per page; footer is one line; build stamp
-  removed from the footer (still in `window.KMD_BUILD`).
+  removed from the footer (still in `window.SC_BUILD`).
 
 **2026-09-18.2100** — Material Design 3 rebuild.
-- `kmd.css` rewritten from tokens up: full M3 color roles (light primary is now
+- `site.css` rewritten from tokens up: full M3 color roles (light primary is now
   tone 40 with white text; the bird blue is primary-container / dark primary),
   the M3 shape scale, the M3 type scale, standard easings.
 - Every element is now an M3 component: app bar + assist chip, buttons in
@@ -1069,3 +1059,11 @@ reality checks for complicated deals*; headlines reworded (*prove it*, *test
 it*); verdicts *At risk*, *Not a deal yet*, *Short*; the bluebird mascot and
 its FAQ removed, the logo on every card and the 404 (*Wrong turn.*); `kill.js`
 renamed `check.js`. Logo stroke 59 → 70 and header mark 30 → 34px.
+
+**2026-10-02.1100** — launch prep. Every reference to killmydeal.com and
+the old name removed from the site, including the home FAQ entry; internal
+names renamed (`kmd.css` → `site.css`, `KMD_BUILD` → `SC_BUILD`, the
+analytics helper `kmd()` → `track()`, the history key). Titles cut to 60
+characters or fewer and descriptions to 160 or fewer so search results
+don't truncate them. Font preloaded on every page; SVGs cached. A verdict
+restored by the back gesture no longer counts as a second analytics event.

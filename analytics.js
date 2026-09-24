@@ -1,10 +1,10 @@
-/* Kill My Deal analytics.
+/* SellClouds analytics.
    Paste your Google Analytics 4 measurement ID below (it looks like G-XXXXXXXXXX).
    Leave it empty and nothing loads. Both pages include this file. */
 var GA_ID = '';
 
 (function () {
-  if (!GA_ID) { window.kmd = function () {}; window.kmdQ = []; return; }
+  if (!GA_ID) { window.scTrack = function () {}; window.scTrackQ = []; return; }
 
   window.dataLayer = window.dataLayer || [];
   function gtag() { dataLayer.push(arguments); }
@@ -22,6 +22,6 @@ var GA_ID = '';
 
   /* Named events with no parameters. Usage, never content. Events fired
      before this file loaded are queued by the page and flushed here. */
-  window.kmd = function (name) { try { gtag('event', name); } catch (e) {} };
-  (window.kmdQ || []).forEach(window.kmd); window.kmdQ = [];
+  window.scTrack = function (name) { try { gtag('event', name); } catch (e) {} };
+  (window.scTrackQ || []).forEach(window.scTrack); window.scTrackQ = [];
 })();

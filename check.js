@@ -4,7 +4,7 @@
    Deal Check and Pipeline Check keep their own scripts. See HANDOFF.md §16. */
 'use strict';
 (function () {
-  const kmd = (n) => { if (typeof window.kmd === 'function') window.kmd(n); else (window.kmdQ = window.kmdQ || []).push(n); };
+  const track = (n) => { if (typeof window.scTrack === 'function') window.scTrack(n); else (window.scTrackQ = window.scTrackQ || []).push(n); };
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const el = () => document.getElementById('screen');
   const show = (html) => { const e = el(); e.classList.remove('enter'); e.innerHTML = html; void e.offsetWidth; e.classList.add('enter'); focusScreen(e); window.scrollTo({ top: 0 }); };
@@ -17,9 +17,9 @@
   // Each screen is a history entry, so the phone's back gesture steps back a screen instead of leaving.
   function nav(st) {
     if (restoring) return;
-    const cur = history.state && history.state.kmd;
+    const cur = history.state && history.state.sc;
     const same = cur && JSON.stringify(cur) === JSON.stringify(st);
-    try { (same ? history.replaceState : history.pushState).call(history, { kmd: st }, '', location.href); } catch {}
+    try { (same ? history.replaceState : history.pushState).call(history, { sc: st }, '', location.href); } catch {}
   }
   // Focus the new screen's heading so keyboard and screen-reader users land where the content is.
   function focusScreen(e) {
@@ -93,7 +93,7 @@
 
     function intro() { show(INTRO_HTML); bind(); }
     function home() { nav(['h']); answers = {}; clearHash(); intro(); }
-    function bind() { const b = document.getElementById('prep'); if (b) b.onclick = () => { kmd(cfg.slug + '_start'); ask(0); }; }
+    function bind() { const b = document.getElementById('prep'); if (b) b.onclick = () => { track(cfg.slug + '_start'); ask(0); }; }
 
     function ask(i) {
       nav(['q', i]);
@@ -119,7 +119,7 @@
     function result(isShared) {
       const s = score(answers); lastScore = s;
       nav(['r']);
-      kmd(cfg.slug + (isShared ? '_verdict_shared' : '_verdict'));
+      if (!restoring) track(cfg.slug + (isShared ? '_verdict_shared' : '_verdict'));   // a back/forward restore is not a new verdict
       const firstMove = s.moves[0] || cfg.noMove;
       show(`
     ${isShared ? `<div class="banner">Someone sent you this verdict. <button id="runMine" type="button">Run your own →</button></div>` : ''}
@@ -159,15 +159,15 @@
       <p class="fine" style="text-align:center;margin:4px 0 0;">Free either way. I answer LinkedIn faster than email.</p>
     </div>`);
       const rm = document.getElementById('runMine'); if (rm) rm.onclick = () => { answers = {}; clearHash(); ask(0); };
-      const g = document.getElementById('grill'); if (g) g.onclick = () => { kmd(cfg.slug + '_grill'); grillStep = 0; grillOuch = 0; shark = null; if (cfg.sharks) pickShark(); else grill(); };
+      const g = document.getElementById('grill'); if (g) g.onclick = () => { track(cfg.slug + '_grill'); grillStep = 0; grillOuch = 0; shark = null; if (cfg.sharks) pickShark(); else grill(); };
       document.getElementById('again').onclick = () => { answers = {}; clearHash(); ask(0); };
       document.getElementById('copy').onclick = (e) => {
-        const btn = e.currentTarget; kmd(cfg.slug + '_share');
+        const btn = e.currentTarget; track(cfg.slug + '_share');
         try { history.replaceState(history.state, '', '#' + encode()); } catch {}
         shareOut(btn, shareBlock(s), cfg.name);
       };
       document.getElementById('dmBtn').onclick = (e) => {
-        const btn = e.currentTarget; kmd(cfg.slug + '_dm_copy');
+        const btn = e.currentTarget; track(cfg.slug + '_dm_copy');
         copyText(cfg.dm(s)).then(() => { btn.textContent = 'Copied ✓'; window.open('https://www.linkedin.com/in/markflournoy/', '_blank', 'noopener'); })
           .catch(() => { btn.textContent = "Couldn't copy"; });
       };
@@ -186,7 +186,7 @@
       ${Object.keys(cfg.sharks).map(id => `<button class="choice" data-shark="${id}" type="button">${esc(cfg.sharks[id].name)}</button>`).join('')}
     </div>
     <button class="btn btn-text" id="back" type="button">← Back to the verdict</button>`);
-      el().querySelectorAll('[data-shark]').forEach(b => b.onclick = () => { shark = b.dataset.shark; kmd(cfg.slug + '_shark'); grillStep = 0; grillOuch = 0; grill(); });
+      el().querySelectorAll('[data-shark]').forEach(b => b.onclick = () => { shark = b.dataset.shark; track(cfg.slug + '_shark'); grillStep = 0; grillOuch = 0; grill(); });
       document.getElementById('back').onclick = () => result(false);
     }
     function grill() {
@@ -237,7 +237,7 @@
     </div>`);
       document.getElementById('back2').onclick = () => result(false);
       const text = cfg.dmGrill ? cfg.dmGrill(s, grillOuch) : cfg.dm(s);
-      document.getElementById('dmBtn').onclick = (e) => { const btn = e.currentTarget; kmd(cfg.slug + '_dm_copy');
+      document.getElementById('dmBtn').onclick = (e) => { const btn = e.currentTarget; track(cfg.slug + '_dm_copy');
         copyText(text).then(() => { btn.textContent = 'Copied ✓'; window.open('https://www.linkedin.com/in/markflournoy/', '_blank', 'noopener'); }).catch(() => { btn.textContent = "Couldn't copy"; }); };
       el().querySelector('.preview').onclick = (e) => { const r = document.createRange(); r.selectNodeContents(e.currentTarget); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); };
     }
@@ -245,10 +245,10 @@
     /* Boot */
     const lh = document.getElementById('logoHome'); if (lh) lh.onclick = home;
     bind();
-    try { history.replaceState({ kmd: ['h'] }, '', location.href); } catch {}
+    try { history.replaceState({ sc: ['h'] }, '', location.href); } catch {}
     if (readHash()) result(true);
     window.addEventListener('popstate', (e) => {
-      const st = e.state && e.state.kmd; restoring = true;
+      const st = e.state && e.state.sc; restoring = true;
       const complete = P.every(p => answers[p.k]);
       try {
         if (!st || st[0] === 'h') intro();
@@ -261,6 +261,6 @@
       } finally { restoring = false; }
     });
     window.addEventListener('hashchange', () => { if (readHash()) result(true); });
-    window.KMD_TEST = { score, P };
+    window.SC_TEST = { score, P };
   };
 })();
