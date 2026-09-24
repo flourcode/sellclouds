@@ -1,7 +1,7 @@
 /* SellClouds analytics.
    Paste your Google Analytics 4 measurement ID below (it looks like G-XXXXXXXXXX).
    Leave it empty and nothing loads. Both pages include this file. */
-var GA_ID = '';
+var GA_ID = 'G-BF2DSESJGX';
 
 (function () {
   if (!GA_ID) { window.scTrack = function () {}; window.scTrackQ = []; return; }
