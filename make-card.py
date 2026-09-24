@@ -12,7 +12,7 @@ import sys
 CARDS = {
   'home': dict(out='card.jpg', wordmark='SellClouds', hsize=64,
     headline=['Selling complicated technology', 'is complicated enough.'],
-    dek='Quick reality checks for complicated deals, and field notes for selling to government.',
+    dek='Quick reality checks for complicated deals. Free, a minute each.',
     foot='No login. No certification. Nothing stored.', url='sellclouds.com',
     pillars=['DEAL', 'PIPELINE', 'BRIEF', 'TERRITORY', 'PARTNER']),
   'deal': dict(out='card-deal.jpg', wordmark='DEAL CHECK',

@@ -3,7 +3,7 @@
 Everything needed to maintain, extend or rebuild this. One directory, two
 pages, one shared stylesheet and font, no build step, no server, no dependencies.
 
-**Current build: 2026-10-02.1100**
+**Current build: 2026-10-03.0900**
 
 ## Naming: checks, not kills
 
@@ -73,15 +73,17 @@ and left out; it's Mark's to say, and it sits oddly next to a booking link.
 
 
 **The mark** is Mark's own design: an S drawn as one flowing stroke through a
-six-lobed cloud. `logo.svg` is built from geometry, not traced: six identical
-circles (centerline radius 128.5) on a regular hexagon around the origin,
-joined at six notches, plus one symmetric cubic curve for the S, all at a
-single stroke width of 59.1 on a 654 × 704 canvas. It's under 500 bytes and
-smooth at any size. `logo-dark.svg` is the same in `#E8EDF2`; `favicon.svg`
-switches with the browser's colour scheme; `favicon.png`, `apple-touch-icon.png`
-and `logo.png` (600px tall, for the share card) are rendered from the SVG. If
-the mark is ever edited, edit the SVG and re-render the PNGs from it. The dead
-bird stays as the Deal Check mascot on the tool share cards and the 404.
+six-lobed cloud. The shipped version is "option 6" from the October 2026
+weight study: stroke 96, lobes 6% larger than the original drawing, and every
+corner (the outer notches and the inner points) rounded to a radius of 24.
+It's built from exact geometry (six identical circles on a regular hexagon
+plus one symmetric curve for the S, see `logo-src/geometry.py`), then the
+corners are rounded and the result stored as a single filled path.
+`logo.svg` is ink `#131619`, `logo-dark.svg` is `#E8EDF2`, and `favicon.svg`
+switches with the browser's colour scheme. `favicon.png`, `apple-touch-icon.png`
+and `logo.png` (600px tall, for the share cards) are rendered from the SVG;
+if the mark changes, change the SVG and re-render those. `logo-src/` stays
+out of the web root.
 
 **Footers** all end *Not affiliated with the U.S. government or Amazon.*
 The OLR tool and the AWS credentials make the Amazon half worth saying.
@@ -1067,3 +1069,5 @@ analytics helper `kmd()` → `track()`, the history key). Titles cut to 60
 characters or fewer and descriptions to 160 or fewer so search results
 don't truncate them. Font preloaded on every page; SVGs cached. A verdict
 restored by the back gesture no longer counts as a second analytics event.
+
+**2026-10-03.0900** — logo weight study; option 6 shipped (stroke 96, lobes +6%, corner radius 24). Icons and all share cards re-rendered; home card subtitle shortened to fit.
